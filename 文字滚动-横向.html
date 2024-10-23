@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>文字滚动-横向</title>
+</head>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    #container {
+        width: 100px;
+        overflow: hidden;
+        white-space: nowrap;
+        position: relative;
+        border: 1px solid #ccc;
+    }
+
+    .child {
+        display: inline-block;
+        width: 100px;
+        animation: scroll 5s linear infinite;
+    }
+
+
+</style>
+<style id="scrollStyle">
+
+</style>
+<body>
+<button id="refreshBtn">点击刷新子元素</button>
+<div id="container">
+
+</div>
+<script>
+    const container = document.getElementById('container')
+    const scrollStyle = document.getElementById('scrollStyle')
+
+    /**
+     * 获取子元素dom
+     * @param text {string} 子元素文本
+     */
+    const getChildDom = (text) => {
+        return `<span class="child">${text}</span>`
+    }
+
+    let childTextSuffixIndex = 1
+    const refreshChild = () => {
+        container.innerHTML = ''
+
+        let childrenDom = ''
+        const randomNum = Math.floor(Math.random() * 10) + 1
+        for (let i = 0; i < randomNum; i++) {
+            childrenDom += getChildDom(`子元素${childTextSuffixIndex++}`)
+        }
+        container.innerHTML = childrenDom
+
+        childrenDom = container.children
+        if (childrenDom.length === 0) return
+        let totalWidth = 0
+        for (let index = 0; index < childrenDom.length; index++) {
+            totalWidth += childrenDom[index].offsetWidth
+        }
+        if (totalWidth === 0) return
+        const moveWidthPerSecond = 40
+        const animationSecond = totalWidth / moveWidthPerSecond
+        for (let index = 0; index < childrenDom.length; index++) {
+            childrenDom[index].style.animationDuration = `${animationSecond}s`
+        }
+        scrollStyle.innerHTML = `
+        @keyframes scroll {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-${totalWidth}px); }
+        }
+        `
+        const timer = setTimeout(() => {
+            console.log('自动刷新')
+            clearTimeout(timer)
+            refreshChild()
+        }, animationSecond * 1000)
+    }
+
+    const refreshBtn = document.getElementById('refreshBtn')
+    refreshBtn.addEventListener('click', () => {
+        refreshChild()
+    })
+</script>
+</body>
+</html>
